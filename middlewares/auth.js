@@ -6,7 +6,7 @@ const verify = async (req, res, next) => {
   jwt.verify(token, privateKey, (err, decoded) => {
     if (err) {
       return res.status(401).send({
-        message: "Unauthorized",
+        message: "Not Authenticated. You need to log in to view this content",
       });
     }
     req.user_id = decoded.id;

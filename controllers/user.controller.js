@@ -48,7 +48,7 @@ exports.register = async (req, res) => {
           ret[er.path] = er.message;
         })
       } catch(e) {}
-      res.status(500).json({error: "An error occured while attempting to log in", name: e.name, message: ret || e.message});
+      res.status(500).json({error: "An error occured while attempting to register", name: e.name, message: ret || e.message});
     })
 };
 
