@@ -68,10 +68,11 @@ exports.login = async (req, res) => {
         });
       }
       if (!password){
-         return res.status(401).json({message: "Password not provided!"});
+        return res.status(401).json({message: "Password not provided!"});
       }
       if (comparePassword(password, user.password)){
         let payload = {
+          id: user.id,
           full_name: user.full_name,
           email: user.email,
           username: user.username,
@@ -97,3 +98,69 @@ exports.login = async (req, res) => {
       res.status(500).json({error: "An error occured while attempting to log in", name: e.name, message: e.message || ret});
     })
 };
+
+exports.updateUser = async(req, res) => {
+  const userId = parseInt(req.params.userId, 10);
+  const requestUserId = req.user_id;
+  const { 
+    email, 
+    full_name, 
+    username, 
+    profile_image_url, 
+    age, 
+    phone_number 
+  } = req.body;
+
+  if (requestUserId !== userId) {
+    // console.log(typeof(requestUserId));
+    // console.log(typeof(userId));
+    return res.status(403).json({ message: "You are not authorized to perform this action" });
+  }
+
+  try {
+    const user = await User.findByPk(userId);
+    if(!user){
+      return res.status(404).json({message: "User not found"})
+    }
+    await user.update({ email, full_name, username, profile_image_url, age, phone_number });
+    res.status(200).json({
+      message: "User Updated Successfully", 
+      user: {
+        email: user.email,
+        full_name: user.full_name,
+        username: user.username,
+        profile_image_url: user.profile_image_url,
+        age: user.age,
+        phone_number: user.phone_number,
+      },
+    })
+  } catch (error) {
+    res.status(500).json({
+      error: "An error occured while updating the user",
+      message: error.message,
+    })
+  }
+}
+
+exports.deleteUser = async(req, res) => {
+  const userId = parseInt(req.params.userId, 10);
+  const requestUserId = req.user_id;
+
+  if (requestUserId !== userId) {
+    return res.status(403).json({ message: "You are not authorized to perform this action" });
+  }
+
+  try {
+    const user = await User.findByPk(userId);
+    if(!user){
+      return res.status(404).json({message: "User not found"})
+    }
+    await user.destroy();
+    res.status(200).json({message: "Your account has been successfully deleted"})
+  } catch (error) {
+    res.status(500).json({
+      error: "An error occured while deleting the user",
+      message: error.message,
+    })
+  }
+}
