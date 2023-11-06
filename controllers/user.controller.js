@@ -72,6 +72,7 @@ exports.login = async (req, res) => {
       }
       if (comparePassword(password, user.password)){
         let payload = {
+          id: user.id,
           full_name: user.full_name,
           email: user.email,
           username: user.username,
