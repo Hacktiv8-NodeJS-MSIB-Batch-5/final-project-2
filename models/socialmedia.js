@@ -35,6 +35,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
+        isUrl: {
+          msg: "Social Media URL must be a valid URL",
+        },
         notEmpty: {
           args: true,
           msg: "Social Media URL is required"
