@@ -52,7 +52,7 @@ exports.getAllComments = async(req, res) => {
     }
     console.log(comments.length);
     console.log(comments);
-    res.status(201).json(comments)
+    res.status(200).json(comments)
   } catch (error) {
     res.status(500).json(error)
   }
@@ -110,7 +110,7 @@ exports.deleteComment = async(req, res) => {
   try {
     await existingComment.destroy()
     res.status(200).json({
-      message: "Your comment has been deleted"
+      message: "Your comment has been successfully deleted"
     })
   } catch (error) {
     res.status(500).json({

@@ -48,7 +48,7 @@ exports.register = async (req, res) => {
           ret[er.path] = er.message;
         })
       } catch(e) {}
-      res.status(500).json({error: "An error occured while attempting to log in", name: e.name, message: ret || e.message});
+      res.status(500).json({error: "An error occured while attempting to register", name: e.name, message: ret || e.message});
     })
 };
 
@@ -125,16 +125,19 @@ exports.updateUser = async(req, res) => {
   }
 
   try {
-    await user.update({ email, full_name, username, profile_image_url, age, phone_number });
+    await User.update(
+      { email, full_name, username, profile_image_url, age, phone_number },
+      { where: { id: userId } }
+    );
     res.status(200).json({
       message: "User Updated Successfully", 
       user: {
-        email: user.email,
-        full_name: user.full_name,
-        username: user.username,
-        profile_image_url: user.profile_image_url,
-        age: user.age,
-        phone_number: user.phone_number,
+        email: existingUser.email,
+        full_name: existingUser.full_name,
+        username: existingUser.username,
+        profile_image_url: existingUser.profile_image_url,
+        age: existingUser.age,
+        phone_number: existingUser.phone_number,
       },
     })
   } catch (error) {

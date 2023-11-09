@@ -16,7 +16,14 @@ exports.createPhoto = async (req, res) => {
   })
   res.status(201).json({
     message: "Photo  has been created",
-    data
+    data: {
+      id: data.id,
+      poster_image_url: data.poster_image_url,
+      title: data.title,
+      caption: data.caption,
+      UserId: data.UserId
+      // Add other columns you want to include
+    }
   })
   }catch (error) {
     res.status(500).json(error)
@@ -82,7 +89,7 @@ exports.updatePhoto = async(req, res) => {
   }
 
   try {
-    const data = await existingPhoto.update({
+    const photo = await existingPhoto.update({
       title,
       caption,
       poster_image_url
@@ -90,7 +97,7 @@ exports.updatePhoto = async(req, res) => {
 
     res.status(200).json({
       message: "Photo has been updated",
-      data
+      photo
     });
   } catch (error) {
     res.status(500).json(error);
@@ -120,7 +127,7 @@ exports.deletePhoto = async(req, res) => {
   try {
     await existingPhoto.destroy()
     res.status(200).json({
-      message: "Your Photo has been deleted"
+      message: "Your Photo has been successfully deleted"
     })
   } catch (error) {
     res.status(500).json({
