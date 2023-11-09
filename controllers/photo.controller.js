@@ -60,7 +60,7 @@ exports.getAllPhotos = async(req, res) => {
   }
 
     // console.log(data);
-    res.status(200).json(existingPhotos)
+    res.status(200).json({photos: existingPhotos})
   }catch (error) {
     res.status(500).json(error)
   }
@@ -127,7 +127,7 @@ exports.deletePhoto = async(req, res) => {
   try {
     await existingPhoto.destroy()
     res.status(200).json({
-      message: "Your Photo has been successfully deleted"
+      message: "Your photo has been successfully deleted"
     })
   } catch (error) {
     res.status(500).json({

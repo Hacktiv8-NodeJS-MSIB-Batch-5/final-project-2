@@ -119,7 +119,6 @@ exports.putSocMed = async (req, res) => {
           })
         })
         .catch((e) => {
-          console.log(e);
           const ret = {};
           try{
             // log all errors on sequelize schema constraint & validation 
@@ -134,7 +133,7 @@ exports.putSocMed = async (req, res) => {
           });
         })
         .catch((e) => {
-          res.status(500).json({error: "An error occured while attempting to Delete Social Media", message: e.message});
+          res.status(500).json({error: "An error occured while attempting to Update Social Media", message: e.message});
         })
     })
 }
@@ -168,7 +167,6 @@ exports.deleteSocMed = async (req, res) => {
           })
         })
         .catch((e) => {
-          console.log(e);
           res.status(500).json({
             error: "An error occured while attempting to Delete Social Media",
             name: e.name,
