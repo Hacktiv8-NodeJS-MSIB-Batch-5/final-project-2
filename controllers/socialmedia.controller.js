@@ -132,9 +132,9 @@ exports.putSocMed = async (req, res) => {
             message: ret || e.message
           });
         })
-        .catch((e) => {
-          res.status(500).json({error: "An error occured while attempting to Update Social Media", message: e.message});
-        })
+    })
+    .catch((e) => {
+      res.status(500).json({error: "An error occured while attempting to Update Social Media", message: e.message});
     })
 }
 
