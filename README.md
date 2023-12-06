@@ -5,7 +5,7 @@
 2. Erin Gunawan (INJS-KS06-03)
 
 ## Link Deployment
-https://injs06-final-project2.up.railway.app`
+https://injs06-final-project2.up.railway.app
 
 ## Cara Install
 1. run `npm install` untuk menginstall dependensi
