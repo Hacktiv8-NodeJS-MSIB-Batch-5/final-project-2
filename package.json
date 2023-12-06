@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
+    "db:create:test": "cross-env NODE_ENV=test npx sequelize db:create",
+    "db:migrate:test": "cross-env NODE_ENV=test npx sequelize db:migrate",
     "db:create": "npx sequelize db:create",
     "db:migrate": "NODE_ENV=production npx sequelize db:migrate",
     "db:migrate:undo": "npx sequelize db:migrate:undo",
-    "dev": "nodemon index.js",
-    "start": "node index.js"
+    "dev": "nodemon bin/http.js",
+    "start": "node bin/http.js"
   },
   "author": "",
   "license": "ISC",

@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const routes = require("./routes");
 
@@ -22,7 +21,8 @@ app.use((err, req, res, next) => {
   });
 });
 
-const host = process.env.HOST || "http://127.0.0.1";
-const port = process.env.PORT || 3000;
-app.listen(port)
-console.log(`Running on ${host}:${port}`);
+module.exports = app;
+// const host = process.env.HOST || "http://127.0.0.1";
+// const port = process.env.PORT || 3000;
+// app.listen(port)
+// console.log(`Running on ${host}:${port}`);
