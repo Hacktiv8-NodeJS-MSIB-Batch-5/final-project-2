@@ -224,7 +224,7 @@ describe("PUT /users/:userId", () => {
       });
 
       token = login.body.token
-      console.log(token);
+      // console.log(token);
     } catch (err) {
       console.log(err);
     }
@@ -327,7 +327,7 @@ describe("DELETE /users/:userId", () => {
       });
 
       token = login.body.token
-      console.log(token);
+      // console.log(token);
     } catch (err) {
       console.log(err);
     }
