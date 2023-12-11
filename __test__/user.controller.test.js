@@ -90,7 +90,7 @@ describe("POST /users/register", () => {
       expect(res.body).toHaveProperty("message")
       expect(res.body.message).toHaveProperty("email")
       expect(res.body).toHaveProperty("name")
-      expect(res.body.name).toEqual("SequelizeUniqueConstraintError")
+      expect(res.body.name).toStrictEqual("SequelizeUniqueConstraintError")
       
       done();
     })
@@ -105,7 +105,7 @@ describe("POST /users/register", () => {
 
       expect(res.body).toHaveProperty("error")
       expect(res.body).toHaveProperty("name")
-      expect(res.body.name).toEqual("SequelizeValidationError")  
+      expect(res.body.name).toStrictEqual("SequelizeValidationError")  
       expect(res.body).toHaveProperty("message")
       expect(res.body.message).toHaveProperty("full_name")
       expect(res.body.message).toHaveProperty("profile_image_url")
@@ -147,7 +147,7 @@ describe("POST /users/login", () => {
       expect(Object.keys(res.body)).toHaveLength(1)
       expect(res.body.token).toBeTruthy()
       expect(typeof res.body.token).toEqual("string")
-      expect(typeof res.body.token).not.toEqual("integer")
+      expect(typeof res.body.token).not.toStrictEqual("integer")
 
       done()
     })
@@ -165,7 +165,7 @@ describe("POST /users/login", () => {
       expect(res.body).toHaveProperty("message")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toBeTruthy()
-      expect(res.body.message).toEqual(messageStr)
+      expect(res.body.message).toStrictEqual(messageStr)
 
       done()
     })
@@ -183,7 +183,7 @@ describe("POST /users/login", () => {
       expect(res.body).toHaveProperty("message")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toBeTruthy()
-      expect(res.body.message).toEqual(messageStr)
+      expect(res.body.message).toStrictEqual(messageStr)
 
       done()
     })
@@ -242,7 +242,7 @@ describe("PUT /users/:userId", () => {
       expect(res.body.message).toEqual("User Updated Successfully")
       expect(res.body).toHaveProperty("user")
       expect(Object.keys(res.body.user)).toHaveLength(6)
-      expect(res.body.user).toEqual(updatedDataUser)
+      expect(res.body.user).toStrictEqual(updatedDataUser)
 
       done()
     })
@@ -250,7 +250,7 @@ describe("PUT /users/:userId", () => {
   it("should be response 401 || not authenticated", (done) => {
     request(app)
     .put(`/users/${correctId}`)
-    .send({updatedDataUser})
+    .send(updatedDataUser)
     .expect(401)
     .end((err, res) => {
       if(err) done(err)
@@ -258,7 +258,7 @@ describe("PUT /users/:userId", () => {
       expect(Object.keys(res.body)).toHaveLength(1)
       expect(res.body).toHaveProperty("message")
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("Not Authenticated. You need to log in to view this content")
+      expect(res.body.message).toStrictEqual("Not Authenticated. You need to log in to view this content")
       expect(res.body).not.toHaveProperty("user")
 
       done()
@@ -268,7 +268,7 @@ describe("PUT /users/:userId", () => {
     request(app)
     .put(`/users/${wrongId}`)
     .set('token', token)
-    .send({updatedDataUser})
+    .send(updatedDataUser)
     .expect(403)
     .end((err, res) => {
       if(err) done(err)
@@ -276,7 +276,7 @@ describe("PUT /users/:userId", () => {
       expect(Object.keys(res.body)).toHaveLength(1)
       expect(res.body).toHaveProperty("message")
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("You are not authorized to perform this action")
+      expect(res.body.message).toStrictEqual("You are not authorized to perform this action")
       expect(res.body).not.toHaveProperty("user")
 
       done()
@@ -286,7 +286,7 @@ describe("PUT /users/:userId", () => {
     request(app)
     .put(`/users/${outOfRangeId}`)
     .set('token', token)
-    .send({updatedDataUser})
+    .send(updatedDataUser)
     .expect(404)
     .end((err, res) => {
       if(err) done(err)
@@ -294,7 +294,7 @@ describe("PUT /users/:userId", () => {
       expect(Object.keys(res.body)).toHaveLength(1)
       expect(res.body).toHaveProperty("message")
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("User not found")
+      expect(res.body.message).toStrictEqual("User not found")
       expect(res.body).not.toHaveProperty("user")
 
       done();
@@ -344,7 +344,7 @@ describe("DELETE /users/:userId", () => {
       expect(res.body).toHaveProperty("message")
       expect(res.body).toBeTruthy()
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("Your account has been successfully deleted")
+      expect(res.body.message).toStrictEqual("Your account has been successfully deleted")
 
       done()
     })
@@ -360,7 +360,7 @@ describe("DELETE /users/:userId", () => {
       expect(res.body).toHaveProperty("message")
       expect(res.body.message).toBeTruthy()
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("Not Authenticated. You need to log in to view this content")
+      expect(res.body.message).toStrictEqual("Not Authenticated. You need to log in to view this content")
 
       done()
     })
@@ -377,7 +377,7 @@ describe("DELETE /users/:userId", () => {
       expect(res.body).toHaveProperty("message")
       expect(res.body.message).toBeTruthy();
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("You are not authorized to perform this action")
+      expect(res.body.message).toStrictEqual("You are not authorized to perform this action")
 
       done()
     })
@@ -394,7 +394,7 @@ describe("DELETE /users/:userId", () => {
       expect(res.body).toHaveProperty("message")
       expect(res.body.message).toBeTruthy();
       expect(typeof res.body.message).toEqual("string")
-      expect(res.body.message).toEqual("User not found")
+      expect(res.body.message).toStrictEqual("User not found")
 
       done()
     })
