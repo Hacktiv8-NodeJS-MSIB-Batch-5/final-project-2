@@ -54,7 +54,7 @@ exports.getSocMed = async (req, res) => {
     }]
   })
     .then((socMed) => {
-      console.log(socMed);
+      // console.log(socMed);
       res.status(200).json({
         social_medias: socMed
       })
@@ -90,7 +90,7 @@ exports.putSocMed = async (req, res) => {
       }
       const isAuthorized = data.UserId === Number(userId);
       if (! isAuthorized){
-        return res.status(401).json({message: "You are not authorized to perform this action"});
+        return res.status(403).json({message: "You are not authorized to perform this action"});
       }
 
       await SocialMedia.update({
@@ -152,7 +152,7 @@ exports.deleteSocMed = async (req, res) => {
       }
       const isAuthorized = data.UserId === Number(userId);
       if (! isAuthorized){
-        return res.status(401).json({message: "You are not authorized to perform this action"});
+        return res.status(403).json({message: "You are not authorized to perform this action"});
       }
 
       await SocialMedia.destroy({

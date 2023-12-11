@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --detectOpenHandles",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --no-cache --verbose",
     "db:create:test": "cross-env NODE_ENV=test npx sequelize db:create",
     "db:migrate:test": "cross-env NODE_ENV=test npx sequelize db:migrate",
     "db:create": "npx sequelize db:create",
