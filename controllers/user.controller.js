@@ -125,9 +125,9 @@ exports.updateUser = async(req, res) => {
   }
 
   try {
-    await User.update(
+    await existingUser.update(
       { email, full_name, username, profile_image_url, age, phone_number },
-      { where: { id: userId } }
+      // { where: { id: userId } }
     );
     res.status(200).json({
       message: "User Updated Successfully", 
