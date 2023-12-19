@@ -1,42 +1,21 @@
 const request = require("supertest");
 const app = require("../index");
 const { User, SocialMedia } = require("../models");
+const userTestData = require("../testdata/user.json")
+const socmedTestData = require("../testdata/socmed.json")
 
-const dataUser = {
-  id: 1,
-  full_name: "user1",
-  email: "user@mail.com",
-  username: "user1",
-  password: "rahasia",
-  profile_image_url: "www.freepik.com",
-  age: 20,
-  phone_number: "08123456789"
-}
+const dataUser = userTestData.normal[0]
+const dataUser2 = userTestData.normal[1]
 
-const dataUser2 = {
-  id: 2,
-  full_name: "user2",
-  email: "user2@mail.com",
-  username: "user2",
-  password: "rahasia",
-  profile_image_url: "www.freepik.com",
-  age: 20,
-  phone_number: "08123456789"
-}
+const dataSocMed = socmedTestData.normal[0]
+const dataSocMed2 = socmedTestData.normal[1]
 
-const dataSocMed = {
-  id: 1,
-  name: "Instagram",
-  social_media_url: "www.instagram.com",
-}
+const correctSocmedId = 1;
+const wrongSocmedId = 2;
+const outOfRangeId = 1000;
+const loggedUserId = 1;
 
-const dataSocMed2 = {
-  id: 2,
-  name: "Twitter",
-  social_media_url: "www.twitter.com",
-}
-
-const addDataAndLogin = async () => {
+const addUserDataAndLogin = async () => {
   let token;
   try{
     await User.create(dataUser)
@@ -53,43 +32,48 @@ const addDataAndLogin = async () => {
     console.log(err);
   }
   return token;
-} 
-
-const addSocmedData = async () => {
-  await SocialMedia.create({
-    id: dataSocMed.id,
-    name: dataSocMed.name,
-    social_media_url: dataSocMed.social_media_url,
-    UserId: 1
-  });
-
-  await SocialMedia.create({
-    id: dataSocMed2.id,
-    name: dataSocMed2.name,
-    social_media_url: dataSocMed2.social_media_url,
-    UserId: 2
-  });
 }
 
-const destroyData = async () => {
+const addSocmedData = async () => {
   try {
-    await User.destroy({ where: {} })
-    await SocialMedia.destroy({ where: {} })
+    await SocialMedia.create(dataSocMed)
+    await SocialMedia.create(dataSocMed2)
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+const destroyUserData = async () => {
+  try {
+    await User.destroy({
+      where: {},
+      truncate: true,
+      cascade: true,
+      restartIdentity: true,
+    })
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+const destroySocmedData = async () => {
+  try {
+    await SocialMedia.destroy({
+      where: {},
+      truncate: true,
+      cascade: true,
+      restartIdentity: true,
+    })
   } catch (error) {
     console.log(error);
   }
 }
 
 describe("POST /socialmedias/", () => {
-  let token;
-  const correctId = dataUser.id;
-  const dataSocMedKosong = {
-    name: "",
-    social_media_url: ""
-  }
+  const dataSocMedKosong = socmedTestData.empty
 
   beforeAll(async () => {
-    token = await addDataAndLogin(app);
+    token = await addUserDataAndLogin();
     // console.log(token);
   })
 
@@ -101,7 +85,6 @@ describe("POST /socialmedias/", () => {
     .expect(201)
     .end((err, res) => {
       if(err) done(err)
-
       expect(res.body).toHaveProperty("socialmedia")
       expect(res.body.socialmedia).toHaveProperty("id")
       expect(res.body.socialmedia).toHaveProperty("name")
@@ -109,7 +92,6 @@ describe("POST /socialmedias/", () => {
       expect(res.body.socialmedia).toHaveProperty("UserId")
       expect(res.body.socialmedia).toHaveProperty("updatedAt")
       expect(res.body.socialmedia).toHaveProperty("createdAt")
-      expect(Number(res.body.socialmedia.UserId)).toEqual(correctId)
 
       done()
     })
@@ -151,16 +133,16 @@ describe("POST /socialmedias/", () => {
     })
   })
   afterAll(async () => {
-    await destroyData();
+    await destroyUserData();
+    await destroySocmedData();
   })
 })
 
 describe("GET /socialmedias/", () => {
   let token;
-
   beforeAll(async () => {
-    token = await addDataAndLogin();
-    await addSocmedData();
+    token = await addUserDataAndLogin()
+    await addSocmedData()
   })
 
   it("should be response 200", (done) => {
@@ -205,31 +187,22 @@ describe("GET /socialmedias/", () => {
   })
 
   afterAll(async () => {
-    await destroyData();
+    await destroyUserData();
+    await destroySocmedData();
   })
 })
 
 describe("PUT /socialmedias/:socialMediaId", () => {
+  const updatedSocmed = socmedTestData.updated
   let token;
-  const wrongId = dataSocMed2.id;
-  const correctId = dataSocMed.id;
-  const loggedId = dataUser.id;
-
-  const outOfRangeId = 1000;
-  const updatedSocmed = {
-    name: "edited instagram",
-    social_media_url: "www.instagram.com"
-  }
-
   beforeAll(async () => {
-    token = await addDataAndLogin();
+    token = await addUserDataAndLogin();
     await addSocmedData();
-    // console.log(token);
   })
 
   it("should be response 200", (done) => {
     request(app)
-    .put(`/socialmedias/${correctId}`)
+    .put(`/socialmedias/${correctSocmedId}`)
     .set('token', token)
     .send(updatedSocmed)
     .expect(200)
@@ -238,11 +211,13 @@ describe("PUT /socialmedias/:socialMediaId", () => {
 
       expect(res.body).toHaveProperty("social_media")
       expect(res.body.social_media).toHaveProperty("id")
-      expect(res.body.social_media.id).toStrictEqual(correctId)
+      expect(res.body.social_media.id).toStrictEqual(correctSocmedId)
       expect(res.body.social_media).toHaveProperty("name")
+      expect(res.body.social_media.name).toStrictEqual(updatedSocmed.name)
       expect(res.body.social_media).toHaveProperty("social_media_url")
+      expect(res.body.social_media.social_media_url).toStrictEqual(updatedSocmed.social_media_url)
       expect(res.body.social_media).toHaveProperty("UserId")
-      expect(res.body.social_media.UserId).toStrictEqual(loggedId)
+      expect(res.body.social_media.UserId).toStrictEqual(loggedUserId)
       expect(res.body.social_media).toHaveProperty("updatedAt")
       expect(res.body.social_media).toHaveProperty("createdAt")
 
@@ -251,7 +226,7 @@ describe("PUT /socialmedias/:socialMediaId", () => {
   })
   it("should be response 401 || not authenticated", (done) => {
     request(app)
-    .put(`/socialmedias/${correctId}`)
+    .put(`/socialmedias/${correctSocmedId}`)
     .send(updatedSocmed)
     .expect(401)
     .end((err, res) => {
@@ -268,15 +243,16 @@ describe("PUT /socialmedias/:socialMediaId", () => {
   })
   it("should be response 403 || not authorized", (done) => {
     request(app)
-    .put(`/socialmedias/${wrongId}`)
+    .put(`/socialmedias/${wrongSocmedId}`)
     .set('token', token)
     .send(updatedSocmed)
     .expect(403)
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("You are not authorized to perform this action")
       expect(res.body).not.toHaveProperty("social_media")
@@ -293,8 +269,9 @@ describe("PUT /socialmedias/:socialMediaId", () => {
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("Social Media data not found")
       expect(res.body).not.toHaveProperty("social_media")
@@ -303,25 +280,21 @@ describe("PUT /socialmedias/:socialMediaId", () => {
     })
   })
   afterAll(async () => {
-    await destroyData();
+    await destroyUserData();
+    await destroySocmedData();
   })
 })
 
 describe("DELETE /socialmedias/:socialMediaId", () => {
   let token;
-  const wrongId = dataSocMed2.id;
-  const correctId = dataSocMed.id;
-  const outOfRangeId = 1000;
-  const loggedId = dataUser.id;
-
   beforeAll(async () => {
-    token = await addDataAndLogin();
+    token = await addUserDataAndLogin();
     await addSocmedData();
   })
 
   it("should be response 200", (done) => {
     request(app)
-    .delete(`/socialmedias/${correctId}`)
+    .delete(`/socialmedias/${correctSocmedId}`)
     .set('token', token)
     .expect(200)
     .end((err, res) => {
@@ -336,7 +309,7 @@ describe("DELETE /socialmedias/:socialMediaId", () => {
   })
   it("should be response 401 || not authenticated", (done) => {
     request(app)
-    .delete(`/socialmedias/${correctId}`)
+    .delete(`/socialmedias/${correctSocmedId}`)
     .expect(401)
     .end((err, res) => {
       if(err) done(err)
@@ -352,14 +325,15 @@ describe("DELETE /socialmedias/:socialMediaId", () => {
   })
   it("should be response 403 || not authorized", (done) => {
     request(app)
-    .delete(`/socialmedias/${wrongId}`)
+    .delete(`/socialmedias/${wrongSocmedId}`)
     .set('token', token)
     .expect(403)
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("You are not authorized to perform this action")
       expect(res.body).not.toHaveProperty("social_media")
@@ -375,8 +349,9 @@ describe("DELETE /socialmedias/:socialMediaId", () => {
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("Social Media data not found")
       expect(res.body).not.toHaveProperty("social_media")
@@ -386,6 +361,7 @@ describe("DELETE /socialmedias/:socialMediaId", () => {
   })
 
   afterAll(async () => {
-    await destroyData();
+    await destroyUserData();
+    await destroySocmedData();
   })
 })

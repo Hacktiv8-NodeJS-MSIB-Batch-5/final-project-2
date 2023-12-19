@@ -1,61 +1,57 @@
 const request = require("supertest");
 const app = require("../index");
 const { User } = require("../models");
+const userTestData = require("../testdata/user.json")
 
-const dataUser = {
-  id: 1,
-  full_name: "user1",
-  email: "user@mail.com",
-  username: "user1",
-  password: "rahasia",
-  profile_image_url: "www.freepik.com",
-  age: 20,
-  phone_number: "08123456789"
+const dataUser = userTestData.normal[0];
+const dataUser2 = userTestData.normal[1];
+const testingLoginData1 = userTestData.login[0];
+const testingLoginData2 = userTestData.login[1];
+
+const correctUserId = 1;
+const wrongUserId = 2;
+const outOfRangeId = 1000;
+
+const addUserDataAndLogin = async () => {
+  let token;
+  try{
+    await User.create(dataUser)
+    await User.create(dataUser2)
+    const login = await request(app)
+    .post("/users/login")
+    .send({
+      email: dataUser.email,
+      password: dataUser.password
+    });
+
+    token = login.body.token
+  } catch (err) {
+    console.log(err);
+  }
+  return token;
 }
 
-const dataUser2 = {
-  id: 2,
-  full_name: "user2",
-  email: "user2@mail.com",
-  username: "user2",
-  password: "rahasia",
-  profile_image_url: "www.freepik.com",
-  age: 20,
-  phone_number: "08123456789"
-}
-
-const dataUserDuplicateEmail = {
-  id: 2,
-  full_name: "user2",
-  email: "user@mail.com",
-  username: "user2",
-  password: "rahasia",
-  profile_image_url: "www.freepik.com",
-  age: 20,
-  phone_number: "08123456789"
-}
-
-const dataUserTidakLengkap = {
-  email: "mager@mail.com",
-  username: "mager",
-  password: "rahasia",
-}
-
-const testingLoginData1 = {
-  email: "user@mail.com",
-  password: "salahpassword"
-}
-
-const testingLoginData2 = {
-  email: "notfound@mail.com",
-  password: "salahpassword"
+const destroyUserData = async () => {
+  try {
+    await User.destroy({
+      where: {},
+      truncate: true,
+      cascade: true,
+      restartIdentity: true,
+   })
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 describe("POST /users/register", () => {
+  const dataRegist = userTestData.normal[2];
+  const dataUserTidakLengkap = userTestData.incomplete;
+
   it("should be response 201 and equal to the data given", (done) => {
     request(app)
     .post("/users/register")
-    .send(dataUser)
+    .send(dataRegist)
     .expect(201)
     .end((err, res) => {
       if (err) done(err)
@@ -68,12 +64,12 @@ describe("POST /users/register", () => {
       expect(user).toHaveProperty("profile_image_url")
       expect(user).toHaveProperty("age")
       expect(user).toHaveProperty("phone_number")
-      expect(user.email).toEqual(dataUser.email)
-      expect(user.full_name).toEqual(dataUser.full_name)
-      expect(user.username).toEqual(dataUser.username)
-      expect(user.profile_image_url).toEqual(dataUser.profile_image_url)
-      expect(user.age).toEqual(dataUser.age)
-      expect(user.phone_number).toEqual(dataUser.phone_number)
+      expect(user.email).toEqual(dataRegist.email)
+      expect(user.full_name).toEqual(dataRegist.full_name)
+      expect(user.username).toEqual(dataRegist.username)
+      expect(user.profile_image_url).toEqual(dataRegist.profile_image_url)
+      expect(user.age).toEqual(dataRegist.age)
+      expect(user.phone_number).toEqual(dataRegist.phone_number)
 
       done()
     })
@@ -81,7 +77,7 @@ describe("POST /users/register", () => {
   it("should be response 500 || email used is not unique", (done) => {
     request(app)
     .post("/users/register")
-    .send(dataUserDuplicateEmail)
+    .send(dataRegist)
     .expect(500)
     .end((err, res) => {
       if (err) done(err)
@@ -117,7 +113,12 @@ describe("POST /users/register", () => {
   })
   afterAll(async () => {
     try {
-      await User.destroy({ where: {} })
+      await User.destroy({
+        where: {},
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+     })
     } catch (error) {
       console.log(error);
     }
@@ -189,20 +190,11 @@ describe("POST /users/login", () => {
     })
   })
   afterAll(async () => {
-    try {
-      await User.destroy({ where: {} })
-    } catch (error) {
-      console.log(error);
-    }
+    await destroyUserData();
   })
 })
 
 describe("PUT /users/:userId", () => {
-  let token;
-  const wrongId = 2;
-  const correctId = dataUser.id;
-  const outOfRangeId = 1000;
-
   const updatedDataUser = {
     email: dataUser.email,
     full_name: "updated_user1",
@@ -212,26 +204,13 @@ describe("PUT /users/:userId", () => {
     phone_number: dataUser.phone_number
   }
 
+  let token;
   beforeAll(async () => {
-    try{
-      await User.create(dataUser)
-      await User.create(dataUser2)
-      const login = await request(app)
-      .post("/users/login")
-      .send({
-          email: dataUser.email,
-          password: dataUser.password
-      });
-
-      token = login.body.token
-      // console.log(token);
-    } catch (err) {
-      console.log(err);
-    }
+    token = await addUserDataAndLogin();
   })
   it("should be response 200 and equal to the data given", (done) => {
     request(app)
-    .put(`/users/${correctId}`)
+    .put(`/users/${correctUserId}`)
     .set('token', token)
     .send(updatedDataUser)
     .expect(200)
@@ -249,7 +228,7 @@ describe("PUT /users/:userId", () => {
   })
   it("should be response 401 || not authenticated", (done) => {
     request(app)
-    .put(`/users/${correctId}`)
+    .put(`/users/${correctUserId}`)
     .send(updatedDataUser)
     .expect(401)
     .end((err, res) => {
@@ -266,15 +245,16 @@ describe("PUT /users/:userId", () => {
   })
   it("should be response 403 || not authorized", (done) => {
     request(app)
-    .put(`/users/${wrongId}`)
+    .put(`/users/${wrongUserId}`)
     .set('token', token)
     .send(updatedDataUser)
     .expect(403)
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("You are not authorized to perform this action")
       expect(res.body).not.toHaveProperty("user")
@@ -291,8 +271,9 @@ describe("PUT /users/:userId", () => {
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("User not found")
       expect(res.body).not.toHaveProperty("user")
@@ -301,40 +282,18 @@ describe("PUT /users/:userId", () => {
     })
   })
   afterAll(async () => {
-    try {
-      await User.destroy({ where: {} })
-    } catch (error) {
-      console.log(error);
-    }
+    await destroyUserData();
   })
 })
 
 describe("DELETE /users/:userId", () => {
   let token;
-  const wrongId = 2;
-  const correctId = dataUser.id;
-  const outOfRangeId = 1000;
-
   beforeAll(async () => {
-    try{
-      await User.create(dataUser)
-      await User.create(dataUser2)
-      const login = await request(app)
-      .post("/users/login")
-      .send({
-          email: dataUser.email,
-          password: dataUser.password
-      });
-
-      token = login.body.token
-      // console.log(token);
-    } catch (err) {
-      console.log(err);
-    }
+    token = await addUserDataAndLogin();
   })
   it("should be response 200 and equal to the data given", (done) => {
     request(app)
-    .delete(`/users/${correctId}`)
+    .delete(`/users/${correctUserId}`)
     .set('token', token)
     .expect(200)
     .end((err, res) => {
@@ -351,7 +310,7 @@ describe("DELETE /users/:userId", () => {
   })
   it("should be response 401 || not authenticated", (done) => {
     request(app)
-    .delete(`/users/${correctId}`)
+    .delete(`/users/${correctUserId}`)
     .expect(401)
     .end((err, res) => {
       if(err) done(err)
@@ -367,14 +326,15 @@ describe("DELETE /users/:userId", () => {
   })
   it("should be response 403 || not authorized", (done) => {
     request(app)
-    .delete(`/users/${wrongId}`)
+    .delete(`/users/${wrongUserId}`)
     .set('token', token)
     .expect(403)
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(res.body.message).toBeTruthy();
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("You are not authorized to perform this action")
@@ -390,8 +350,9 @@ describe("DELETE /users/:userId", () => {
     .end((err, res) => {
       if(err) done(err)
 
-      expect(Object.keys(res.body)).toHaveLength(1)
+      expect(Object.keys(res.body)).toHaveLength(2)
       expect(res.body).toHaveProperty("message")
+      expect(res.body).toHaveProperty("error")
       expect(res.body.message).toBeTruthy();
       expect(typeof res.body.message).toEqual("string")
       expect(res.body.message).toStrictEqual("User not found")
@@ -401,10 +362,6 @@ describe("DELETE /users/:userId", () => {
   })
   
   afterAll(async () => {
-    try {
-      await User.destroy({ where: {} })
-    } catch (error) {
-      console.log(error);
-    }
+    await destroyUserData();
   })
 })

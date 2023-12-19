@@ -1,0 +1,27 @@
+{
+  "empty": {
+    "name": "",
+    "social_media_url": ""
+  },
+  "normal": [
+    {
+      "name": "Instagram",
+      "social_media_url": "www.instagram.com",
+      "UserId": 1
+    },
+    {
+      "name": "Twitter",
+      "social_media_url": "www.twitter.com",
+      "UserId": 2
+    },
+    {
+      "name": "new",
+      "social_media_url": "www.socmed.com",
+      "UserId": 1
+    }
+  ],
+  "updated": {
+    "name": "edited socmed",
+    "social_media_url": "www.instagram-updated.com"
+  }
+}

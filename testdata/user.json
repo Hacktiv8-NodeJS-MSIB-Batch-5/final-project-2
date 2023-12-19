@@ -1,0 +1,46 @@
+{
+  "normal": [
+    {
+      "full_name": "user1",
+      "email": "user@mail.com",
+      "username": "user1",
+      "password": "rahasia",
+      "profile_image_url": "www.freepik.com",
+      "age": 20,
+      "phone_number": "08123456789"
+    },
+    {
+      "full_name": "user2",
+      "email": "user2@mail.com",
+      "username": "user2",
+      "password": "rahasia",
+      "profile_image_url": "www.freepik.com",
+      "age": 20,
+      "phone_number": "08123456789"
+    },
+    {
+      "full_name": "register",
+      "email": "register@mail.com",
+      "username": "register",
+      "password": "rahasia",
+      "profile_image_url": "www.freepik.com",
+      "age": 20,
+      "phone_number": "08123456789"
+    }
+  ],
+  "incomplete": {
+    "email": "incomplete@mail.com",
+    "username": "incomplete",
+    "password": "rahasia"
+  },
+  "login": [
+    {
+      "email": "user@mail.com",
+      "password": "salahpassword"
+    },
+    {
+      "email": "notfound@mail.com",
+      "password": "salahpassword"
+    }
+  ]
+}
