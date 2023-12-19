@@ -89,7 +89,7 @@ describe("POST /socialmedias/", () => {
   }
 
   beforeAll(async () => {
-    token = await addDataAndLogin(app);
+    token = await addDataAndLogin();
     // console.log(token);
   })
 
