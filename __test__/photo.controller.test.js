@@ -76,8 +76,18 @@ const createPhotos = async() => {
 
 const destroyData = async() => {
     try {
-        await User.destroy({ where: {} })
-        await Photo.destroy({ where: {} })
+        await User.destroy({ 
+            where: {},
+            truncate: true,
+            cascade: true,
+            resetIdentity: true
+        })
+        await Photo.destroy({ 
+            where: {},
+            truncate: true,
+            cascade: true,
+            resetIdentity: true
+        })
     } catch (error) {
         console.log(error);
     }
@@ -101,9 +111,9 @@ describe("POST /photos/", () => {
             expect(Object.keys(res.body)).toHaveLength(1)
             expect(res.body).toHaveProperty("message")
             expect(typeof res.body.message).toEqual("string")
-            expect(res.body).not.toHaveProperty("title");
-            expect(res.body).not.toHaveProperty("caption");
-            expect(res.body).not.toHaveProperty("poster_image_url");
+            expect(res.body).not.toHaveProperty("title")
+            expect(res.body).not.toHaveProperty("caption")
+            expect(res.body).not.toHaveProperty("poster_image_url")
             // expect(res.body).not.toHaveProperty("user")
             done()
         })

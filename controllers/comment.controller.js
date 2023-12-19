@@ -15,7 +15,7 @@ exports.createComment = async(req, res) => {
     })
     res.status(201).json({
       message: "Comment has been created",
-      data
+      comment: data
     })
   } catch (error) {
     res.status(500).json(error)
@@ -52,7 +52,9 @@ exports.getAllComments = async(req, res) => {
     }
     console.log(comments.length);
     console.log(comments);
-    res.status(200).json(comments)
+    res.status(200).json({
+      comments: comments
+    })
   } catch (error) {
     res.status(500).json(error)
   }
@@ -81,7 +83,7 @@ exports.updateComment = async(req, res) => {
     const data = await existingComment.update({ comment })
     res.status(200).json({
       message: "Comment has been updated",
-      data
+      comment: data
     })
   } catch (error) {
     res.status(500).json(error);
