@@ -109,7 +109,7 @@ describe("POST /photos/", () => {
         })
     })
 
-    it("Should be response 500 || validation error", (done) => {
+    it("Should be response 500 || validation error", (done) => { // koneksi error / server error, kalo validasi itu 400
         const dataInvalid = {
             title: "",
             caption: "",
