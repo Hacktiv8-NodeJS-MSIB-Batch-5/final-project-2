@@ -3,7 +3,7 @@ const app = require("../index")
 const { User, Photo, Comment } = require("../models")
 
 const dataUser1 = {
-    id: 1,
+    // id: 1,
     full_name: "user1",
     email: "user1@mail.com",
     username: "user1",
@@ -14,7 +14,7 @@ const dataUser1 = {
 }
 
 const dataUser2 = {
-    id: 2,
+    // id: 2,
     full_name: "user2",
     email: "user2@mail.com",
     username: "user2",
@@ -58,7 +58,7 @@ const registerAndLogin = async() => {
 
 const createPhotos = async() => {
     await Photo.create({
-        id: dataPhoto1.id,
+        // id: dataPhoto1.id,
         title: dataPhoto1.title,
         caption: dataPhoto1.caption,
         poster_image_url: dataPhoto1.poster_image_url,
@@ -66,61 +66,98 @@ const createPhotos = async() => {
     })
 
     await Photo.create({
-        id: dataPhoto2.id,
+        // id: dataPhoto2.id,
         title: dataPhoto2.title,
         caption: dataPhoto2.caption,
         poster_image_url: dataPhoto2.poster_image_url,
         UserId:2
     })
+
+    // const data = await Photo.findAll()
+    // console.log("data", data);
 }
 
 const createComments = async() => {
     await Comment.create({
-        id: 1,
+        // id: 1,
         comment: "komen1",
         PhotoId: 1,
         UserId: 1
     })
     await Comment.create({
-        id: 2,
+        // id: 2,
         comment: "komen2",
         PhotoId: 2,
         UserId: 2
     })
 }
 
-const destroyData = async() => {
+const destroyUserData = async () => {
     try {
-        await User.destroy({ 
-            where: {},
-            truncate: true,
-            cascade: true,
-            resetIdentity: true
-        })
-        await Photo.destroy({ 
-            where: {},
-            truncate: true,
-            cascade: true,
-            resetIdentity: true
-        })
-        await Comment.destroy({
-            where: {},
-            truncate: true,
-            cascade: true,
-            resetIdentity: true
-        })
+      await User.destroy({
+        where: {},
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+      })
     } catch (error) {
-        console.log(error);
+      console.log(error);
     }
 }
 
-describe("POST /comments/", () => {
-    let token
+const destroyPhotoData = async () => {
+    try {
+      await Photo.destroy({
+        where: {},
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+      })
+    } catch (error) {
+      console.log(error);
+    }
+}
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-    })
+const destroyCommentData = async () => {
+    try {
+      await Comment.destroy({
+        where: {},
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+      })
+    } catch (error) {
+      console.log(error);
+    }
+}
+
+let token;
+
+beforeEach(async () => {
+    // const before = await Photo.findAll()
+    // console.log("before", before);
+
+    token = await registerAndLogin();
+    await createPhotos();
+    await createComments();
+    
+    // const after = await Photo.findAll()
+    // console.log("after", after);
+})
+
+afterEach(async () => {
+    await destroyUserData();
+    await destroyPhotoData();
+    await destroyCommentData();
+})
+
+describe("POST /comments/", () => {
+    // let token;
+
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    // })
 
     it("Should be response 401 || not authenticated", (done) => {
         request(app)
@@ -163,19 +200,22 @@ describe("POST /comments/", () => {
         })
     })
 
-    afterAll(async() => {
-        await destroyData()
-    })
+    // afterAll(async() => {
+    //     // await destroyData()
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    //     await destroyCommentData();
+    // })
 })
 
 describe("GET /comments/", () => {
-    let token
+    // let token
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-        await createComments()
-    })
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    //     await createComments()
+    // })
 
     it("Should be response 401 || not authenticated", (done) => {
         request(app)
@@ -213,24 +253,27 @@ describe("GET /comments/", () => {
         })
     })
 
-    afterAll(async() => {
-        await destroyData()
-    })
+    // afterAll(async() => {
+    //     // await destroyData()
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    //     await destroyCommentData();
+    // })
 })
 
 describe("PUT /comments/:commentId", () => {
-    let token
+    // let token
     const wrongId = 2;
     const correctId = 1;
     const invalidId = 10
-    const loggedId = dataUser1.id;
+    const loggedId = 1;
     const newComment = { comment: "komen baru"}
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-        await createComments()
-    })
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    //     await createComments()
+    // })
 
     it("Should be response 404 || comment not found", (done) => {
         request(app)
@@ -304,22 +347,25 @@ describe("PUT /comments/:commentId", () => {
         })
     })
 
-    afterAll(async() => {
-        await destroyData()
-    })
+    // afterAll(async() => {
+    //     // await destroyData()
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    //     await destroyCommentData();
+    // })
 })
 
 describe("DELETE /comments/:commentId", () => {
-    let token
+    // let token
     const wrongId = 2;
     const correctId = 1;
     const invalidId = 10
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-        await createComments()
-    })
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    //     await createComments()
+    // })
 
     it("Should be response 404 || comment not found", (done) => {
         request(app)
@@ -388,7 +434,10 @@ describe("DELETE /comments/:commentId", () => {
         })
     })
     
-    afterAll(async() => {
-        await destroyData()
-    })
+    // afterAll(async() => {
+    //     // await destroyData()
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    //     await destroyCommentData();
+    // })
 })

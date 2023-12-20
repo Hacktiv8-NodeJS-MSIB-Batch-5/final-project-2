@@ -34,7 +34,7 @@ const addUserDataAndLogin = async () => {
   return token;
 }
 
-const addSocmedData = async () => {
+const createSocmedData = async () => {
   try {
     await SocialMedia.create(dataSocMed)
     await SocialMedia.create(dataSocMed2)
@@ -69,19 +69,34 @@ const destroySocmedData = async () => {
   }
 }
 
+let token;
+beforeEach(async () => {
+  token = await addUserDataAndLogin();
+  await createSocmedData();
+  // console.log(token);
+})
+
+afterEach(async () => {
+  await destroyUserData();
+  await destroySocmedData();
+})
+
 describe("POST /socialmedias/", () => {
   const dataSocMedKosong = socmedTestData.empty
 
-  beforeAll(async () => {
-    token = await addUserDataAndLogin();
-    // console.log(token);
-  })
+  // beforeAll(async () => {
+  //   token = await addUserDataAndLogin();
+  //   // console.log(token);
+  // })
 
   it("should be response 201", (done) => {
     request(app)
     .post("/socialmedias")
     .set('token', token)
-    .send(dataSocMed)
+    .send({
+      "name": "posted socmed",
+      "social_media_url": "www.socmed.com"
+    })
     .expect(201)
     .end((err, res) => {
       if(err) done(err)
@@ -132,18 +147,18 @@ describe("POST /socialmedias/", () => {
       done()
     })
   })
-  afterAll(async () => {
-    await destroyUserData();
-    await destroySocmedData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  //   await destroySocmedData();
+  // })
 })
 
 describe("GET /socialmedias/", () => {
-  let token;
-  beforeAll(async () => {
-    token = await addUserDataAndLogin()
-    await addSocmedData()
-  })
+  // let token;
+  // beforeAll(async () => {
+  //   token = await addUserDataAndLogin()
+  //   await addSocmedData()
+  // })
 
   it("should be response 200", (done) => {
     request(app)
@@ -186,19 +201,19 @@ describe("GET /socialmedias/", () => {
     })
   })
 
-  afterAll(async () => {
-    await destroyUserData();
-    await destroySocmedData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  //   await destroySocmedData();
+  // })
 })
 
 describe("PUT /socialmedias/:socialMediaId", () => {
   const updatedSocmed = socmedTestData.updated
-  let token;
-  beforeAll(async () => {
-    token = await addUserDataAndLogin();
-    await addSocmedData();
-  })
+  // let token;
+  // beforeAll(async () => {
+  //   token = await addUserDataAndLogin();
+  //   await addSocmedData();
+  // })
 
   it("should be response 200", (done) => {
     request(app)
@@ -279,18 +294,18 @@ describe("PUT /socialmedias/:socialMediaId", () => {
       done()
     })
   })
-  afterAll(async () => {
-    await destroyUserData();
-    await destroySocmedData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  //   await destroySocmedData();
+  // })
 })
 
 describe("DELETE /socialmedias/:socialMediaId", () => {
-  let token;
-  beforeAll(async () => {
-    token = await addUserDataAndLogin();
-    await addSocmedData();
-  })
+  // let token;
+  // beforeAll(async () => {
+  //   token = await addUserDataAndLogin();
+  //   await addSocmedData();
+  // })
 
   it("should be response 200", (done) => {
     request(app)
@@ -360,8 +375,8 @@ describe("DELETE /socialmedias/:socialMediaId", () => {
     })
   })
 
-  afterAll(async () => {
-    await destroyUserData();
-    await destroySocmedData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  //   await destroySocmedData();
+  // })
 })

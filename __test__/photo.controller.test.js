@@ -58,7 +58,6 @@ const registerAndLogin = async() => {
 
 const createPhotos = async() => {
     await Photo.create({
-        id: dataPhoto1.id,
         title: dataPhoto1.title,
         caption: dataPhoto1.caption,
         poster_image_url: dataPhoto1.poster_image_url,
@@ -66,44 +65,74 @@ const createPhotos = async() => {
     })
 
     await Photo.create({
-        id: dataPhoto2.id,
         title: dataPhoto2.title,
         caption: dataPhoto2.caption,
         poster_image_url: dataPhoto2.poster_image_url,
-        UserId:2
+        UserId: 2
     })
 }
 
-const destroyData = async() => {
+const destroyUserData = async () => {
     try {
-        await User.destroy({ 
-            where: {},
-            truncate: true,
-            cascade: true,
-            resetIdentity: true
-        })
-        await Photo.destroy({ 
-            where: {},
-            truncate: true,
-            cascade: true,
-            resetIdentity: true
-        })
+      await User.destroy({
+        where: {},
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+      })
     } catch (error) {
-        console.log(error);
+      console.log(error);
+    }
+  }
+
+const destroyPhotoData = async () => {
+    try {
+      await Photo.destroy({
+        where: {},
+        truncate: true,
+        cascade: true,
+        restartIdentity: true,
+      })
+    } catch (error) {
+      console.log(error);
     }
 }
 
-describe("POST /photos/", () => {
-    let token
+let token;
+
+beforeEach(async () => {
+    // const before = await Photo.findAll()
+    // console.log("before", before);
+
+    token = await registerAndLogin();
+    await createPhotos();
     
-    beforeAll(async () => {
-        token = await registerAndLogin()
-    })
+    // const after = await Photo.findAll()
+    // console.log("after", after);
+})
+
+afterEach(async () => {
+    await destroyUserData();
+    await destroyPhotoData();
+})
+
+describe("POST /photos/", () => {
+    // let token
+    
+    // beforeAll(async () => {
+    //     token = await registerAndLogin()
+    // })
+
+    const newDataPhoto = {
+        title: "photo new",
+        caption: "caption new",
+        poster_image_url: "www.freepik.com"
+    }
 
     it("should be response 401 || not authenticated", (done) => {
         request(app)
         .post("/photos")
-        .send(dataPhoto1)
+        .send(newDataPhoto)
         .expect(401)
         .end((err, res) => {
             if(err) done(err)
@@ -146,7 +175,7 @@ describe("POST /photos/", () => {
         request(app)
         .post("/photos")
         .set('token', token)
-        .send(dataPhoto1)
+        .send(newDataPhoto)
         .expect(201)
         .end((err, res) => {
             if(err) done(err)
@@ -161,18 +190,20 @@ describe("POST /photos/", () => {
         })
     })
 
-    afterAll(async () => {
-        await destroyData()
-    })
+    // afterAll(async () => {
+    //     // await destroyData();
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    // })
 })
 
 describe("GET /photos/", () => {
-    let token
+    // let token
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-    })
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    // })
 
     it("Should be response 401 || not authenticated", (done) => {
         request(app)
@@ -210,13 +241,15 @@ describe("GET /photos/", () => {
         })
     })
 
-    afterAll(async () => {
-        await destroyData()
-    })
+    // afterAll(async () => {
+    //     // await destroyData()
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    // })
 })
 
 describe("PUT /photos/:photoId", () => {
-    let token
+    // let token
     const correctId = dataPhoto1.id
     const wrongId = dataPhoto2.id
     const invalidId = 1000
@@ -228,10 +261,10 @@ describe("PUT /photos/:photoId", () => {
         poster_image_url: "www.freepik.com"
     }
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-    })
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    // })
 
     it("Should be response 404 || photo not found", (done) => {
         request(app)
@@ -307,21 +340,23 @@ describe("PUT /photos/:photoId", () => {
         })
     })
 
-    afterAll(async () => {
-        await destroyData()
-    })
+    // afterAll(async () => {
+    //     // await destroyData()
+    //     await destroyUserData();
+    //     await destroyPhotoData();
+    // })
 })
 
 describe("DELETE /photos/:photoId", () => {
-    let token
+    // let token
     const correctId = dataPhoto1.id
     const wrongId = dataPhoto2.id
     const invalidId = 1000
 
-    beforeAll(async() => {
-        token = await registerAndLogin()
-        await createPhotos()
-    })
+    // beforeAll(async() => {
+    //     token = await registerAndLogin()
+    //     await createPhotos()
+    // })
 
     it("Should be response 404 || photo not found", (done) => {
         request(app)
@@ -378,7 +413,7 @@ describe("DELETE /photos/:photoId", () => {
         .delete(`/photos/${correctId}`)
         .set('token', token)
         .expect(200)
-        .end((err, res) => {
+        .end(async (err, res) => {
             if(err) done(err)
 
             expect(Object.keys(res.body)).toHaveLength(1)
@@ -390,7 +425,7 @@ describe("DELETE /photos/:photoId", () => {
         })
     })
     
-    afterAll(async () => {
-        await destroyData()
-    })
+    // afterAll(async () => {
+    //     await destroyData()
+    // })
 })

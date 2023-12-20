@@ -45,13 +45,13 @@ exports.getAllComments = async(req, res) => {
     })
     
     if(comments.length === 0){
-      console.log(typeof(userId));
+      // console.log(typeof(userId));
       return res.status(404).json({
         message: "Comments not found"
       })
     }
-    console.log(comments.length);
-    console.log(comments);
+    // console.log(comments.length);
+    // console.log(comments);
     res.status(200).json({
       comments: comments
     })

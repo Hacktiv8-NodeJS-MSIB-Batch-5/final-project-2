@@ -44,6 +44,15 @@ const destroyUserData = async () => {
   }
 }
 
+let token;
+beforeAll(async () => {
+  token = await addUserDataAndLogin();
+})
+
+afterAll(async () => {
+  await destroyUserData();
+})
+
 describe("POST /users/register", () => {
   const dataRegist = userTestData.normal[2];
   const dataUserTidakLengkap = userTestData.incomplete;
@@ -111,28 +120,28 @@ describe("POST /users/register", () => {
       done();
     })
   })
-  afterAll(async () => {
-    try {
-      await User.destroy({
-        where: {},
-        truncate: true,
-        cascade: true,
-        restartIdentity: true,
-     })
-    } catch (error) {
-      console.log(error);
-    }
-  })
+  // afterAll(async () => {
+  //   try {
+  //     await User.destroy({
+  //       where: {},
+  //       truncate: true,
+  //       cascade: true,
+  //       restartIdentity: true,
+  //    })
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // })
 })
 
 describe("POST /users/login", () => {
-  beforeAll(async () => {
-    try{
-      await User.create(dataUser)
-    } catch (err) {
-      console.log(err);
-    }
-  })
+  // beforeAll(async () => {
+  //   try{
+  //     await User.create(dataUser)
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // })
   it("should be response 201", (done) => {
     request(app)
     .post("/users/login")
@@ -189,9 +198,9 @@ describe("POST /users/login", () => {
       done()
     })
   })
-  afterAll(async () => {
-    await destroyUserData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  // })
 })
 
 describe("PUT /users/:userId", () => {
@@ -204,10 +213,10 @@ describe("PUT /users/:userId", () => {
     phone_number: dataUser.phone_number
   }
 
-  let token;
-  beforeAll(async () => {
-    token = await addUserDataAndLogin();
-  })
+  // let token;
+  // beforeAll(async () => {
+  //   token = await addUserDataAndLogin();
+  // })
   it("should be response 200 and equal to the data given", (done) => {
     request(app)
     .put(`/users/${correctUserId}`)
@@ -281,16 +290,16 @@ describe("PUT /users/:userId", () => {
       done();
     })
   })
-  afterAll(async () => {
-    await destroyUserData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  // })
 })
 
 describe("DELETE /users/:userId", () => {
-  let token;
-  beforeAll(async () => {
-    token = await addUserDataAndLogin();
-  })
+  // let token;
+  // beforeAll(async () => {
+  //   token = await addUserDataAndLogin();
+  // })
   it("should be response 200 and equal to the data given", (done) => {
     request(app)
     .delete(`/users/${correctUserId}`)
@@ -361,7 +370,7 @@ describe("DELETE /users/:userId", () => {
     })
   })
   
-  afterAll(async () => {
-    await destroyUserData();
-  })
+  // afterAll(async () => {
+  //   await destroyUserData();
+  // })
 })
